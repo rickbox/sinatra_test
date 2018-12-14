@@ -1,0 +1,11 @@
+<p>title</p>
+<% @memo.each do |m| %>
+<form action="/update/<%= m["id"] %>" method="post">
+  <input type="hidden" name="_method" value="PATCH">
+  <input type="text" name="title" class="title" value="<%= m["title"]%>" required>
+  <br>
+	<textarea name="content" class="content" required><%= m["content"]%></textarea>
+  <br>
+  <input type="submit" class="button is-success is-medium" value="変更">
+</form>
+<% end %>

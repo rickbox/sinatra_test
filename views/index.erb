@@ -1,0 +1,10 @@
+<% @memos.each do |m| %>
+<p>
+  <br>・
+  <a href="/show/<%= m["id"] %>" >
+  <%= m["title"] %>
+  </a>
+</p>
+<% end %>
+<br><br>
+<input type="button" class="button is-primary is-medium" onclick="location.href='/create'"value="追加">
