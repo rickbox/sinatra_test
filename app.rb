@@ -2,13 +2,12 @@ require "bundler/setup"
 require "sinatra"
 require "sinatra/reloader"
 
-enable :method_override 
 
-$json_file_path = "data/data.json"
+Json_file_path = "data/data.json"
 
 
 #jsonをハッシュに
-$memos_hash = open($json_file_path) do |file|
+$memos_hash = open(Json_file_path) do |file|
   JSON.load(file)
 end
 
@@ -62,7 +61,7 @@ end
 
 #jsonの更新
 def update_data
-  File.open($json_file_path, "w") do |file|
+  File.open(Json_file_path, "w") do |file|
     JSON.dump($memos_hash, file)
   end
 end
