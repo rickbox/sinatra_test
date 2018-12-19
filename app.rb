@@ -1,68 +1,69 @@
-require "bundler/setup"
-require "sinatra"
-require "sinatra/reloader"
+# frozen_string_literal: true
 
-enable :method_override 
+require 'bundler/setup'
+require 'sinatra'
+require 'sinatra/reloader'
 
-$json_file_path = "data/data.json"
+JSON_FILE_PATH = 'data/data.json'
 
-
-#jsonをハッシュに
-$memos_hash = open($json_file_path) do |file|
-  JSON.load(file)
+def load_json
+  open(JSON_FILE_PATH) do |file|
+    JSON.load(file)
+  end
 end
 
-#ハッシュから配列に
-memos_array = $memos_hash["memos"]
-
-
-get "/" do
-  @memos = memos_array
+get '/' do
+  memos_hash = load_json
+  @memos = memos_hash['memos']
   erb :index
 end
 
-get "/create" do
+get '/create' do
   erb :create
 end
 
-post "/new" do
-  new_id = memos_array.last["id"] + 1
-  new_memo = {"id" => new_id, "title" => params[:title], "content" => params[:content]}
-  $memos_hash["memos"].push(new_memo)
+post '/new' do
+  memos_hash = load_json
+  new_id = memos_hash['memos'].last['id'] + 1
+  new_memo = { 'id' => new_id, 'title' => params[:title], 'content' => params[:content] }
+  memos_hash['memos'].push(new_memo)
 
-  update_data
-  redirect "/"
+  File.open(JSON_FILE_PATH, 'w') do |file|
+    JSON.dump(memos_hash, file)
+  end
+  redirect '/'
 end
 
-get "/show/:id" do |id|
-  @memo = $memos_hash["memos"].select {|memo| memo["id"] == id.to_i }
+get '/:id' do |id|
+  memos_hash = load_json
+  @memo = memos_hash['memos'].select { |memo| memo['id'] == id.to_i }
   erb :show
 end
 
-delete "/destroy/:id" do |id|
-  $memos_hash["memos"].delete_if {|memo| memo["id"] == id.to_i }
+delete '/:id' do |id|
+  memos_hash = load_json
+  memos_hash['memos'].delete_if { |memo| memo['id'] == id.to_i }
 
-  update_data
-  redirect "/"
+  File.open(JSON_FILE_PATH, 'w') do |file|
+    JSON.dump(memos_hash, file)
+  end
+  redirect '/'
 end
 
-get "/edit/:id" do |id|
-  @memo = $memos_hash["memos"].select {|memo| memo["id"] == id.to_i }
+get '/edit/:id' do |id|
+  memos_hash = load_json
+  @memo = memos_hash['memos'].select { |memo| memo['id'] == id.to_i }
   erb :edit
 end
 
 patch '/update/:id' do |id|
-  #配列のインデックス取得
-  index = $memos_hash["memos"].find_index {|memo| memo["id"] == id.to_i }
-  $memos_hash["memos"][index] = {"id" => id.to_i, "title" => params[:title], "content" => params[:content]}
+  memos_hash = load_json
+  # 配列のインデックス取得
+  index = memos_hash['memos'].find_index { |memo| memo['id'] == id.to_i }
+  memos_hash['memos'][index] = { 'id' => id.to_i, 'title' => params[:title], 'content' => params[:content] }
 
-  update_data
-  redirect "/show/#{id}"
-end
-
-#jsonの更新
-def update_data
-  File.open($json_file_path, "w") do |file|
-    JSON.dump($memos_hash, file)
+  File.open(JSON_FILE_PATH, 'w') do |file|
+    JSON.dump(memos_hash, file)
   end
+  redirect "/#{id}"
 end
