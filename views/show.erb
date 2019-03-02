@@ -5,7 +5,7 @@
 <br><br>
 <input type="button" class="button is-success is-medium" onclick="location.href='/edit/<%= m["id"] %>'" value="変更">
 <br><br>
-<form method="post" action="/destroy/<%= m["id"] %>">
+<form method="post" action="/<%= m["id"] %>">
     <input type="hidden" name="_method" value="DELETE">
     <input type="submit" value="削除" class="button is-danger is-medium">
 </form>
